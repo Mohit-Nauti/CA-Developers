@@ -1,0 +1,138 @@
+
+Note: !important --> Please crete the single trigger and single abstract class-
+If you have a new trigger requirement on same object simply create an apex class and extend the same abstract class and override its methods.
+
+/**********************APEX TRIGGER******************************************/
+
+trigger AccountTrigger on Account (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
+    try{
+        TriggerHandlar handler = new AccountTriggerHandler(Trigger.new, Trigger.newMap, Trigger.oldMap);
+        
+        if (Trigger.isBefore) {
+            if (Trigger.isInsert) {
+                handler.executeBeforeInsert();
+            }
+            
+            if (Trigger.isUpdate) {
+                handler.executeBeforeUpdate();            
+            }
+            
+            if (Trigger.isDelete) {
+                handler.executeBeforeDelete();
+            }
+        }
+        
+        if (Trigger.isAfter) {
+            if (Trigger.isInsert) {
+                handler.executeAfterInsert();
+            }
+            
+            if (Trigger.isUpdate) {
+                handler.executeAfterUpdate();            
+            }
+            
+            if (Trigger.isDelete) {
+                handler.executeAfterDelete();
+            }
+            
+            if (Trigger.isUndelete) {
+                handler.executeAfterUndelete();
+            }
+        }
+    }
+    catch(Exception ex){
+       
+    }
+}
+
+/**************************TRIGGER HANDLAR OR ABSTRACT CLASS*****************************************/
+
+public abstract class TriggerHandlar {
+ public TriggerHandlar() {}
+    
+    public abstract void executeBeforeInsert();
+    
+    public abstract void executeAfterInsert();    
+    
+    public abstract void executeBeforeUpdate();
+    
+    public abstract void executeAfterUpdate();
+    
+    public abstract void executeBeforeDelete();
+    
+    public abstract void executeAfterDelete();
+    
+    public abstract void executeAfterUndelete();
+}
+
+
+/***********************APEX CLASS*********************************/
+
+public class AccountTriggerHandler extends TriggerHandlar {
+    
+    // new Account, new map, old map
+    private final List<Account> newAccount;
+    private final Map<Id, Account> newAccountsById;
+    private final Map<Id, Account> oldAccountsById;     
+    
+    // constructor
+    public AccountTriggerHandler(List<Account> newAccount, Map<Id, Account> newAccountsById, Map<Id, Account> oldAccountsById) {
+        super();
+        this.newAccount = (List<Account>) newAccount;
+        this.newAccountsById = (Map<Id, Account>)newAccountsById;
+        this.oldAccountsById = (Map<Id, Account>)oldAccountsById;    
+    }
+    
+    // HERE WE UPDATE THE ACCOUNT NAME-
+	
+    public override void executeBeforeInsert() {
+        try{
+            for(Account accounts : newAccount){
+                
+                accounts.Name = accounts.Name + '_Salesforce Developer';
+                
+            }            
+        }
+        catch(Exception e){
+            system.debug('Error-------->'+e.getMessage()+ 'At line number---------->>>'+e.getLineNumber());
+        }
+    }
+    
+    // HERE WE INSERT CONTACT UNDER THE ACCOUNT-
+    
+    public override void executeAfterInsert(){     
+        
+        list <Contact> conList = new list <Contact>();
+        
+        for(Account objaccount : newAccount){            
+            contact objCon = new contact();
+            objCon.LastName = objaccount.Name + '_Child';
+            objCon.AccountId = objaccount.id;
+            conList.add(objCon);
+        } 
+        if(conList.size()>0){
+            insert conList;
+        }
+    }
+    
+    public override void executeBeforeUpdate() {
+        system.debug(LoggingLevel.ERROR, 'Account TRIGGER HANDLER BEFORE UPDATE');   
+    }
+    
+    public override void executeAfterUpdate() {
+        system.debug(LoggingLevel.ERROR, 'Account TRIGGER HANDLER AFTER UPDATE');   
+    }
+    
+    public override void executeBeforeDelete() {
+        system.debug(LoggingLevel.ERROR, 'Account TRIGGER HANDLER BEFORE DELETE');   
+    }
+    
+    public override void executeAfterDelete() {
+        system.debug(LoggingLevel.ERROR, 'Account TRIGGER HANDLER AFTER DELETE');   
+    }
+    
+    public override void executeAfterUndelete() {
+        system.debug(LoggingLevel.ERROR, 'Account TRIGGER HANDLER AFTER UNDELETE');   
+    }    
+}
+

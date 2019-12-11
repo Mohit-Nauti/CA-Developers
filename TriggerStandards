@@ -1,0 +1,128 @@
+/**********************************************************/
+//Created by: Mohit Kumar 12/11/2019
+//
+//Description: 
+//This trigger handles logic to be run when changes occur to 
+//the Leads objects.
+
+
+/*************************Create one trigger for one object **********************************/
+
+
+trigger LeadTrigger on Lead (before insert, after insert, before update, after update, before delete, after delete, after undelete) {
+    try{
+        TriggerHandler handler = new LeadTriggerHandler(Trigger.new, Trigger.newMap, Trigger.oldMap);
+        
+        if (Trigger.isBefore) {
+            if (Trigger.isInsert) {
+                handler.executeBeforeInsert();
+            }
+            
+            if (Trigger.isUpdate) {
+                handler.executeBeforeUpdate();            
+            }
+            
+            if (Trigger.isDelete) {
+                handler.executeBeforeDelete();
+            }
+        }
+        
+        if (Trigger.isAfter) {
+            if (Trigger.isInsert) {
+                handler.executeAfterInsert();
+            }
+            
+            if (Trigger.isUpdate) {
+                handler.executeAfterUpdate();            
+            }
+            
+            if (Trigger.isDelete) {
+                handler.executeAfterDelete();
+            }
+            
+            if (Trigger.isUndelete) {
+                handler.executeAfterUndelete();
+            }
+        }
+    }
+    catch(Exception ex){
+       
+    }
+}
+
+/***************Create a abstract classs for all trigger's event*****************/
+
+public abstract class TriggerHandler {
+   
+    public TriggerHandler() {}
+    
+    public abstract void executeBeforeInsert();
+    
+    public abstract void executeAfterInsert();    
+    
+    public abstract void executeBeforeUpdate();
+    
+    public abstract void executeAfterUpdate();
+    
+    public abstract void executeBeforeDelete();
+    
+    public abstract void executeAfterDelete();
+    
+    public abstract void executeAfterUndelete();
+}
+
+***************************************
+**********************************************************/
+//Created by: Mohit Kumar 11/11/2019
+//
+//Description: 
+//This handles logic to be run when changes occur to 
+//the Leads objects.
+
+
+/*********************Inherit the above abstract class and override its method*************************************/
+
+
+public class LeadTriggerHandler extends TriggerHandler {
+    
+    // new leads, new map, old map
+    private final List<Lead> newLeads;
+    private final Map<Id, Lead> newLeadsById;
+    private final Map<Id, Lead> oldLeadsById;     
+    
+    // constructor
+    public LeadTriggerHandler(List<sObject> newLeads, Map<Id, sObject> newLeadsById, Map<Id, sObject> oldLeadsById) {
+        super();
+        this.newLeads = (List<Lead>) newLeads;
+        this.newLeadsById = (Map<Id, Lead>)newLeadsById;
+        this.oldLeadsById = (Map<Id, Lead>)oldLeadsById;    
+    }
+    
+    public override void executeBeforeInsert() {
+        system.debug(LoggingLevel.ERROR, 'LEAD TRIGGER HANDLER BEFORE INSERT');   
+    }
+    
+    public override void executeAfterInsert() {     
+        system.debug(LoggingLevel.ERROR, 'LEAD TRIGGER HANDLER AFTER INSERT');   
+    }
+    
+    public override void executeBeforeUpdate() {
+        system.debug(LoggingLevel.ERROR, 'LEAD TRIGGER HANDLER BEFORE UPDATE');   
+    }
+    
+    public override void executeAfterUpdate() {
+        system.debug(LoggingLevel.ERROR, 'LEAD TRIGGER HANDLER AFTER UPDATE');   
+    }
+    
+    public override void executeBeforeDelete() {
+        system.debug(LoggingLevel.ERROR, 'LEAD TRIGGER HANDLER BEFORE DELETE');   
+    }
+    
+    public override void executeAfterDelete() {
+        system.debug(LoggingLevel.ERROR, 'LEAD TRIGGER HANDLER AFTER DELETE');   
+    }
+    
+    public override void executeAfterUndelete() {
+        system.debug(LoggingLevel.ERROR, 'LEAD TRIGGER HANDLER AFTER UNDELETE');   
+    }    
+}
